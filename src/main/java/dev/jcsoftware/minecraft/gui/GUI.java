@@ -3,10 +3,7 @@ package dev.jcsoftware.minecraft.gui;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -15,7 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class GUI<T extends JavaPlugin> implements InventoryHolder, Listener {
+public abstract class GUI<T extends JavaPlugin> implements InventoryHolder {
   @Getter private final T plugin;
   @Getter private final Inventory inventory;
 
@@ -24,14 +21,11 @@ public abstract class GUI<T extends JavaPlugin> implements InventoryHolder, List
   public GUI(T plugin) {
     this.plugin = plugin;
     this.inventory = Bukkit.createInventory(this, getSize(), getTitle());
-
-    plugin.getServer()
-        .getPluginManager()
-        .registerEvents(this, plugin);
   }
 
   public abstract int getSize();
   public abstract String getTitle();
+  public abstract boolean canClose(Player player);
 
   public void onClose(Player player) {}
 
@@ -47,7 +41,10 @@ public abstract class GUI<T extends JavaPlugin> implements InventoryHolder, List
     }
 
     itemPositionMap.remove(index);
-    itemPositionMap.put(index, item);
+    if (item != null && item.getItemStack() != null) {
+      itemPositionMap.put(index, item);
+    }
+
     generate();
   }
 
@@ -64,13 +61,12 @@ public abstract class GUI<T extends JavaPlugin> implements InventoryHolder, List
   }
 
   public interface ButtonCompletion {
-    ButtonAction onClick();
+    ButtonAction onClick(Player whoClicked, ItemStack clickedItem);
   }
 
   public enum ButtonAction {
     CLOSE_GUI,
-    CANCEL,
-    ALLOW
+    CANCEL
   }
 
   public void open(Player player) {
@@ -78,10 +74,10 @@ public abstract class GUI<T extends JavaPlugin> implements InventoryHolder, List
     player.openInventory(inventory);
   }
 
-  @EventHandler
-  private void onClick(InventoryClickEvent event) {
+  public void handleOnClick(InventoryClickEvent event) {
     if (event.getClickedInventory() == null) return;
     if (!event.getClickedInventory().equals(inventory)) return;
+    if (!(event.getWhoClicked() instanceof Player)) return;
 
     int index = event.getSlot();
     GUIItem item = itemPositionMap.get(index);
@@ -92,21 +88,13 @@ public abstract class GUI<T extends JavaPlugin> implements InventoryHolder, List
       return;
     }
 
-    ButtonAction result = item.getOnClick().onClick();
-    switch (result) {
-      case CANCEL:
-        event.setCancelled(true);
-        break;
-      case CLOSE_GUI:
-        event.getWhoClicked().closeInventory();
-        break;
-    }
-  }
+    Player player = (Player) event.getWhoClicked();
 
-  @EventHandler
-  private void onInventoryClose(InventoryCloseEvent event) {
-    if (!event.getInventory().equals(inventory)) return;
-    if (!(event.getPlayer() instanceof Player)) return;
-    onClose((Player) event.getPlayer());
+    event.setCancelled(true);
+
+    ButtonAction result = item.getOnClick().onClick(player, event.getCurrentItem());
+    if (result == ButtonAction.CLOSE_GUI && canClose(player)) {
+      event.getWhoClicked().closeInventory();
+    }
   }
 }
