@@ -1,6 +1,8 @@
 # MCGUIAPI
 MCGUIAPI is a Minecraft Spigot Plugin tool which simplifies the process of showing a player a GUI with clickable elements.
 
+![Example GUI](https://raw.githubusercontent.com/JordanOsterberg/MCGUIAPI/master/examplegui.png)
+
 ## How to Install
 You can use JitPack to use this API via Maven or Gradle. 
 
