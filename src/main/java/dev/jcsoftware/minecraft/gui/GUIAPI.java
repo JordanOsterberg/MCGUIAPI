@@ -41,6 +41,7 @@ public class GUIAPI<T extends JavaPlugin> implements Listener {
   private void onClick(InventoryClickEvent event) {
     if (!(event.getWhoClicked() instanceof Player)) return;
     GUI<T> open = getOpenGUI((Player) event.getWhoClicked());
+    if (open == null) return;
     open.handleOnClick(event);
   }
 
