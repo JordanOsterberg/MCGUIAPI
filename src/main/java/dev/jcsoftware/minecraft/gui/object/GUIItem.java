@@ -1,4 +1,4 @@
-package dev.jcsoftware.minecraft.gui;
+package dev.jcsoftware.minecraft.gui.object;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +7,8 @@ import org.bukkit.inventory.ItemStack;
 @RequiredArgsConstructor
 @Getter
 public class GUIItem {
-  private final GUI.ButtonCompletion onClick;
-  private final ItemStack itemStack;
+
+	private final GUI.ButtonCompletion onClick;
+	private final ItemStack itemStack;
+
 }
