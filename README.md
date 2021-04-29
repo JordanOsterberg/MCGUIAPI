@@ -8,7 +8,7 @@ You can use JitPack to use this API via Maven or Gradle.
 
 You could also take all of the classes and add them to your project directly, but it's better practice to use the Maven dependency in the event of major changes.
 
-[![](https://jitpack.io/v/JordanOsterberg/MCGUIAPI.svg)](https://jitpack.io/#JordanOsterberg/JScoreboards)
+[![](https://jitpack.io/v/JordanOsterberg/MCGUIAPI.svg)](https://jitpack.io/#JordanOsterberg/MCGUIAPI)
 
 **Repository**:
 ```
