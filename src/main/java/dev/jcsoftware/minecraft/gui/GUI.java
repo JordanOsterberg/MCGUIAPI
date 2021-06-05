@@ -65,8 +65,23 @@ public abstract class GUI<T extends JavaPlugin> implements InventoryHolder {
   }
 
   public enum ButtonAction {
-    CLOSE_GUI,
-    CANCEL
+    CLOSE_GUI {
+      @Override
+      public void run(GUI<?> gui, InventoryClickEvent event) {
+        if (gui.canClose((Player) event.getWhoClicked())) event.getWhoClicked().closeInventory();
+      }
+    },
+    CANCEL {
+      @Override
+      public void run(GUI<?> gui, InventoryClickEvent event) {
+        event.setCancelled(true);
+      }
+    },
+    NONE {
+      @Override public void run(GUI<?> gui, InventoryClickEvent event) {}
+    };
+
+    public abstract void run(GUI<?> gui, InventoryClickEvent event);
   }
 
   public void open(Player player) {
@@ -90,11 +105,7 @@ public abstract class GUI<T extends JavaPlugin> implements InventoryHolder {
 
     Player player = (Player) event.getWhoClicked();
 
-    event.setCancelled(true);
-
     ButtonAction result = item.getOnClick().onClick(player, event.getCurrentItem());
-    if (result == ButtonAction.CLOSE_GUI && canClose(player)) {
-      event.getWhoClicked().closeInventory();
-    }
+    result.run(this, event);
   }
 }
