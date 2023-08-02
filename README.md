@@ -96,7 +96,7 @@ public class YourPlugin extends JavaPlugin {
   private GUIAPI<YourPlugin> guiAPI;
 
   public void onEnable() {
-    guiAPI = new GUIAPI(this);
+    guiAPI = new GUIAPI<>(this);
   }
 }
 ```
